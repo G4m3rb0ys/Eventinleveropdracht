@@ -4,31 +4,20 @@
     ViewData["Title"] = "Index";
 }
 
-<style>
-    body {
-        background-color: #333333;
-        color: white;
-    }
-
-    table {
-        background-color: #444444;
-        color: white;
-    }
-
-        table th, table td {
-            color: white;
-        }
-
-    a {
-        color: #ffcc00;
-    }
 </style>
 
 <h1>Admin page</h1>
 
-<p>
-    <a asp-action="Create">Create new Admin</a>
-</p>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <a asp-action="Create" class="btn btn-warning">Create new Admin</a>
+
+    <form asp-action="Index" method="get" style="display: flex;">
+        <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" placeholder="Search by name" class="form-control" />
+        <button type="submit" class="btn btn-primary" style="margin-left: 5px;">Search</button>
+    </form>
+</div>
+
+
 <table class="table">
     <thead>
         <tr>
@@ -56,31 +45,31 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
+                <tr>
+                    <td>
                     @Html.DisplayFor(modelItem => item.AdminCode)
-                </td>
-                <td>
+                    </td>
+                    <td>
                     @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
+                    </td>
+                    <td>
                     @Html.DisplayFor(modelItem => item.Email)
-                </td>
-                <td>
+                    </td>
+                    <td>
                     @Html.DisplayFor(modelItem => item.Username)
-                </td>
-                <td>
+                    </td>
+                    <td>
                     @Html.DisplayFor(modelItem => item.Password)
-                </td>
-                <td>
+                    </td>
+                    <td>
                     @Html.DisplayFor(modelItem => item.Role)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
         }
     </tbody>
 </table>
