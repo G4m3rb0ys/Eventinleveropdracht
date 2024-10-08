@@ -1,8 +1,37 @@
-﻿@{
+﻿@model IEnumerable<Eventinleveropdracht.Models.Event>
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome to the (event locations name) website</h1>
-    <p>Here you can see what events are hapening </a>.</p>
+    <p>Upcoming events:</p>
 </div>
+
+@if (Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Event Name</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ev in Model)
+            {
+                <tr>
+                    <td>@ev.Name</td>
+                    <td>@ev.FromDate.ToString("yyyy-MM-dd")</td>
+                    <td>@ev.ToDate.ToString("yyyy-MM-dd")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No upcoming events available at the moment.</p>
+}
