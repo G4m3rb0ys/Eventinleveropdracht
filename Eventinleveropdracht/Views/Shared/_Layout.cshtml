@@ -42,9 +42,8 @@
         </nav>
     </header>
 
-    <!-- Zorg ervoor dat de main flexbox-regels opvolgt -->
     <div class="container">
-        <main role="main" class="pb-3" style="flex-grow: 1;">
+        <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
@@ -84,5 +83,8 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    @RenderSection("Scripts", required: false)
+
 </body>
 </html>

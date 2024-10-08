@@ -24,17 +24,13 @@ namespace Eventinleveropdracht.Controllers
         {
             var admins = from a in _context.Admins
                          select a;
-
             if (!String.IsNullOrEmpty(searchString))
             {
                 admins = admins.Where(a => a.Name.Contains(searchString));
             }
-
             ViewData["CurrentFilter"] = searchString;
-
             return View(await admins.ToListAsync());
         }
-
 
         // GET: Admins/Details/5
         public async Task<IActionResult> Details(int? id)
