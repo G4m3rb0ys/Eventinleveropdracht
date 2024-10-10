@@ -8,6 +8,7 @@
     <h1 class="display-4">Welcome to the (event locations name) website</h1>
     <p>Upcoming events:</p>
 </div>
+
 @if (Model.Any())
 {
     <table class="table">
@@ -16,6 +17,7 @@
                 <th>Event Name</th>
                 <th>Start Date</th>
                 <th>End Date</th>
+                <th>Reserve</th>
             </tr>
         </thead>
         <tbody>
@@ -25,6 +27,12 @@
                     <td>@ev.Name</td>
                     <td>@ev.FromDate.ToString("yyyy-MM-dd")</td>
                     <td>@ev.ToDate.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        <!-- Reserveerknop -->
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reserveModal" data-event-id="@ev.Id" data-event-name="@ev.Name">
+                            Reserveer
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -33,4 +41,66 @@
 else
 {
     <p>No upcoming events available at the moment.</p>
+}
+
+<div class="modal fade" id="reserveModal" tabindex="-1" aria-labelledby="reserveModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reserveModalLabel">Reserveer voor <span id="eventName"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-controller="Events" asp-action="Reserve" id="reservationForm">
+                    <input type="hidden" id="eventId" name="EventID" />
+                    <div class="form-group">
+                        <label for="name">Naam:</label>
+                        <input type="text" class="form-control" id="name" name="Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" class="form-control" id="email" name="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ticketType">Ticket Type:</label>
+                        <select class="form-control" id="ticketType" name="Type" required>
+                            <option value="normaal">Normaal</option>
+                            <option value="vip">VIP</option>
+                            <option value="backstage">Backstage</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Aantal Tickets:</label>
+                        <input type="number" class="form-control" id="amount" name="Amount" min="1" value="1" required>
+                    </div>
+                    <input type="hidden" id="price" name="Price" />
+                    <button type="submit" class="btn btn-primary">Reserveer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#reserveModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var eventId = button.data('event-id');
+                var eventName = button.data('event-name');
+
+                var modal = $(this);
+                modal.find('#eventName').text(eventName);
+                modal.find('#eventId').val(eventId);
+
+                $('#amount').on('input', function () {
+                    var amount = $(this).val();
+                    var price = amount * 15;
+                    modal.find('#price').val(price);
+                });
+            });
+        });
+    </script>
+
 }

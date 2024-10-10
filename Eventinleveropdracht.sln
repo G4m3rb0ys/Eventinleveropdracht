@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventinleveropdracht", "Eventinleveropdracht\Eventinleveropdracht.csproj", "{CA93E30A-1F64-4413-8B76-7DA3AB620EE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eventinleveropdracht", "Eventinleveropdracht\Eventinleveropdracht.csproj", "{CA93E30A-1F64-4413-8B76-7DA3AB620EE4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventsListAPI", "EventsListAPI\EventsListAPI.csproj", "{4FC6C952-DFBE-4242-9C30-EF2A1AD5DA67}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{CA93E30A-1F64-4413-8B76-7DA3AB620EE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA93E30A-1F64-4413-8B76-7DA3AB620EE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA93E30A-1F64-4413-8B76-7DA3AB620EE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FC6C952-DFBE-4242-9C30-EF2A1AD5DA67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FC6C952-DFBE-4242-9C30-EF2A1AD5DA67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FC6C952-DFBE-4242-9C30-EF2A1AD5DA67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FC6C952-DFBE-4242-9C30-EF2A1AD5DA67}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

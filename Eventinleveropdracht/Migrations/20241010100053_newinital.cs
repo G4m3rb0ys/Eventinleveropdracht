@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Eventinleveropdracht.Migrations
 {
     /// <inheritdoc />
-    public partial class AddclassestoDB : Migration
+    public partial class newinital : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -73,12 +73,12 @@ namespace Eventinleveropdracht.Migrations
                     ReservationNumber = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ammount = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Amount = table.Column<int>(type: "int", nullable: false),
                     Paid = table.Column<bool>(type: "bit", nullable: false),
                     Price = table.Column<int>(type: "int", nullable: false),
                     EventID = table.Column<int>(type: "int", nullable: false),
-                    GuestId = table.Column<int>(type: "int", nullable: false)
+                    GuestId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -93,8 +93,7 @@ namespace Eventinleveropdracht.Migrations
                         name: "FK_Reservaties_Users_GuestId",
                         column: x => x.GuestId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -122,7 +121,7 @@ namespace Eventinleveropdracht.Migrations
                         column: x => x.GuestId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -152,17 +151,17 @@ namespace Eventinleveropdracht.Migrations
             migrationBuilder.InsertData(
                 table: "Events",
                 columns: new[] { "Id", "CurrentParticipants", "Description", "FromDate", "Image", "Location", "MaxParticipants", "Name", "OrganiserId", "Requirements", "ToDate", "Type" },
-                values: new object[] { 2, 50, "This is a beautiful event performing a concert of a well-known DJ", new DateTime(2024, 9, 20, 11, 41, 15, 207, DateTimeKind.Local).AddTicks(5685), "ComingSoon.jpg", "Entire venue", 500, "Test2", 1, "[\"Ticket\",\"ID\"]", new DateTime(2024, 9, 20, 11, 41, 15, 207, DateTimeKind.Local).AddTicks(5737), "Concert" });
+                values: new object[] { 2, 50, "This is a beautiful event performing a concert of a well-known DJ", new DateTime(2024, 10, 10, 12, 0, 52, 606, DateTimeKind.Local).AddTicks(3132), "ComingSoon.jpg", "Entire venue", 500, "Test2", 1, "[\"Ticket\",\"ID\"]", new DateTime(2024, 10, 10, 12, 0, 52, 606, DateTimeKind.Local).AddTicks(3183), "Concert" });
 
             migrationBuilder.InsertData(
                 table: "Reservaties",
-                columns: new[] { "Id", "Date", "Description", "Email", "EventID", "GuestId", "Name", "Paid", "Price", "ReservationNumber", "ammount", "type" },
-                values: new object[] { 1, new DateTime(2024, 9, 20, 11, 41, 15, 207, DateTimeKind.Local).AddTicks(5766), "This is a test", "Testing@gmail.com", 2, 2, "Jane Doe", true, 50, 1234, 2, "VIP" });
+                columns: new[] { "Id", "Amount", "Date", "Description", "Email", "EventID", "GuestId", "Name", "Paid", "Price", "ReservationNumber", "Type" },
+                values: new object[] { 1, 2, new DateTime(2024, 10, 10, 12, 0, 52, 606, DateTimeKind.Local).AddTicks(3211), "This is a test", "Testing@gmail.com", 2, null, "Jane Doe", true, 50, 1234, "VIP" });
 
             migrationBuilder.InsertData(
                 table: "Orders",
                 columns: new[] { "Id", "Date", "GuestId", "ReservatieId", "Status" },
-                values: new object[] { 1, new DateTime(2024, 9, 20, 11, 41, 15, 207, DateTimeKind.Local).AddTicks(5784), 2, 1, "Paid" });
+                values: new object[] { 1, new DateTime(2024, 10, 10, 12, 0, 52, 606, DateTimeKind.Local).AddTicks(3233), 2, 1, "Paid" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Events_OrganiserId",

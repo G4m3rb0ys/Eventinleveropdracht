@@ -44,13 +44,6 @@ namespace Eventinleveropdracht.Data
                 .HasForeignKey(r => r.EventID)
                 .OnDelete(DeleteBehavior.Restrict); // Geen cascade delete
 
-            // Order -> Guest (One-to-Many) zonder cascade delete
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.Guest)
-                .WithMany(g => g.Orders)
-                .HasForeignKey(o => o.GuestId)
-                .OnDelete(DeleteBehavior.Restrict);  // Geen cascade delete
-
             // Order -> Reservatie (One-to-One of Many) zonder cascade delete
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Reservatie)
@@ -150,12 +143,11 @@ namespace Eventinleveropdracht.Data
                     ReservationNumber = 1234,
                     Description = "This is a test",
                     Date = DateTime.Now,
-                    type = "VIP",
-                    ammount = 2,
+                    Type = "VIP",   // Aangepast naar 'Type'
+                    Amount = 2,     // Aangepast naar 'Amount'
                     Paid = true,
                     Price = 50,
-                    EventID = 2,  // Verwijzing naar het Event (Test2)
-                    GuestId = 2  // Verwijzing naar Guest (Jane Doe)
+                    EventID = 2  // Verwijzing naar het Event (Test2)
                 }
             );
 

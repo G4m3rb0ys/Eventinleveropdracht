@@ -22,7 +22,7 @@ namespace Eventinleveropdracht.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Event", b =>
+            modelBuilder.Entity("Eventinleveropdracht.Models.Event", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -81,14 +81,14 @@ namespace Eventinleveropdracht.Migrations
                             Id = 2,
                             CurrentParticipants = 50,
                             Description = "This is a beautiful event performing a concert of a well-known DJ",
-                            FromDate = new DateTime(2024, 9, 20, 11, 41, 15, 207, DateTimeKind.Local).AddTicks(5685),
+                            FromDate = new DateTime(2024, 10, 10, 12, 0, 52, 606, DateTimeKind.Local).AddTicks(3132),
                             Image = "ComingSoon.jpg",
                             Location = "Entire venue",
                             MaxParticipants = 500,
                             Name = "Test2",
                             OrganiserId = 1,
                             Requirements = "[\"Ticket\",\"ID\"]",
-                            ToDate = new DateTime(2024, 9, 20, 11, 41, 15, 207, DateTimeKind.Local).AddTicks(5737),
+                            ToDate = new DateTime(2024, 10, 10, 12, 0, 52, 606, DateTimeKind.Local).AddTicks(3183),
                             Type = "Concert"
                         });
                 });
@@ -126,7 +126,7 @@ namespace Eventinleveropdracht.Migrations
                         new
                         {
                             Id = 1,
-                            Date = new DateTime(2024, 9, 20, 11, 41, 15, 207, DateTimeKind.Local).AddTicks(5784),
+                            Date = new DateTime(2024, 10, 10, 12, 0, 52, 606, DateTimeKind.Local).AddTicks(3233),
                             GuestId = 2,
                             ReservatieId = 1,
                             Status = "Paid"
@@ -140,6 +140,9 @@ namespace Eventinleveropdracht.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -155,7 +158,7 @@ namespace Eventinleveropdracht.Migrations
                     b.Property<int>("EventID")
                         .HasColumnType("int");
 
-                    b.Property<int>("GuestId")
+                    b.Property<int?>("GuestId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -171,10 +174,7 @@ namespace Eventinleveropdracht.Migrations
                     b.Property<int>("ReservationNumber")
                         .HasColumnType("int");
 
-                    b.Property<int>("ammount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("type")
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -190,17 +190,16 @@ namespace Eventinleveropdracht.Migrations
                         new
                         {
                             Id = 1,
-                            Date = new DateTime(2024, 9, 20, 11, 41, 15, 207, DateTimeKind.Local).AddTicks(5766),
+                            Amount = 2,
+                            Date = new DateTime(2024, 10, 10, 12, 0, 52, 606, DateTimeKind.Local).AddTicks(3211),
                             Description = "This is a test",
                             Email = "Testing@gmail.com",
                             EventID = 2,
-                            GuestId = 2,
                             Name = "Jane Doe",
                             Paid = true,
                             Price = 50,
                             ReservationNumber = 1234,
-                            ammount = 2,
-                            type = "VIP"
+                            Type = "VIP"
                         });
                 });
 
@@ -340,7 +339,7 @@ namespace Eventinleveropdracht.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Event", b =>
+            modelBuilder.Entity("Eventinleveropdracht.Models.Event", b =>
                 {
                     b.HasOne("Eventinleveropdracht.Models.Organizer", "Organiser")
                         .WithMany()
@@ -355,7 +354,7 @@ namespace Eventinleveropdracht.Migrations
                     b.HasOne("Eventinleveropdracht.Models.Guest", "Guest")
                         .WithMany("Orders")
                         .HasForeignKey("GuestId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Eventinleveropdracht.Models.Reservatie", "Reservatie")
@@ -371,33 +370,29 @@ namespace Eventinleveropdracht.Migrations
 
             modelBuilder.Entity("Eventinleveropdracht.Models.Reservatie", b =>
                 {
-                    b.HasOne("Event", "Event")
+                    b.HasOne("Eventinleveropdracht.Models.Event", "Event")
                         .WithMany("Reservations")
                         .HasForeignKey("EventID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Eventinleveropdracht.Models.Guest", "Guest")
+                    b.HasOne("Eventinleveropdracht.Models.Guest", null)
                         .WithMany("Reservaties")
-                        .HasForeignKey("GuestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GuestId");
 
                     b.Navigation("Event");
-
-                    b.Navigation("Guest");
                 });
 
             modelBuilder.Entity("Eventinleveropdracht.Models.Cashier", b =>
                 {
-                    b.HasOne("Event", "Event")
+                    b.HasOne("Eventinleveropdracht.Models.Event", "Event")
                         .WithMany()
                         .HasForeignKey("EventId");
 
                     b.Navigation("Event");
                 });
 
-            modelBuilder.Entity("Event", b =>
+            modelBuilder.Entity("Eventinleveropdracht.Models.Event", b =>
                 {
                     b.Navigation("Reservations");
                 });

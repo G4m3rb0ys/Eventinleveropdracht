@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Eventinleveropdracht.Data;
 using Eventinleveropdracht.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Eventinleveropdracht.Controllers
 {
@@ -27,20 +26,33 @@ namespace Eventinleveropdracht.Controllers
         }
 
         // GET: Events/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, string searchString)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
+            // Haal het event op met reserveringen
             var @event = await _context.Events
-                .Include(n => n.Organiser)
+                .Include(e => e.Organiser)
+                .Include(e => e.Reservations) // Zorg dat reserveringen geladen worden
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (@event == null)
             {
                 return NotFound();
             }
+
+            // Zoekfilter toepassen op de reserveringen
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                @event.Reservations = @event.Reservations
+                    .Where(r => r.Name.ToLower().Contains(searchString.ToLower()))
+                    .ToList();
+            }
+
+            ViewData["CurrentFilter"] = searchString;
 
             return View(@event);
         }
@@ -48,7 +60,6 @@ namespace Eventinleveropdracht.Controllers
         // GET: Events/Create
         public IActionResult Create()
         {
-            // Wijzig "Discriminator" naar "Name" om de naam van de organiser weer te geven
             ViewData["OrganiserId"] = new SelectList(_context.Organizers, "Id", "Name");
             return View();
         }
@@ -64,7 +75,6 @@ namespace Eventinleveropdracht.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            // Zorg ervoor dat de naam van de organiser wordt weergegeven
             ViewData["OrganiserId"] = new SelectList(_context.Organizers, "Id", "Name", @event.OrganiserId);
             return View(@event);
         }
@@ -82,7 +92,6 @@ namespace Eventinleveropdracht.Controllers
             {
                 return NotFound();
             }
-            // Wijzig "Discriminator" naar "Name"
             ViewData["OrganiserId"] = new SelectList(_context.Organizers, "Id", "Name", @event.OrganiserId);
             return View(@event);
         }
@@ -117,7 +126,6 @@ namespace Eventinleveropdracht.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            // Wijzig "Discriminator" naar "Name"
             ViewData["OrganiserId"] = new SelectList(_context.Organizers, "Id", "Name", @event.OrganiserId);
             return View(@event);
         }
@@ -159,6 +167,25 @@ namespace Eventinleveropdracht.Controllers
         private bool EventExists(int id)
         {
             return _context.Events.Any(e => e.Id == id);
+        }
+
+        // POST: Reservering maken
+        [HttpPost]
+        public IActionResult Reserve(Reservatie reservatie)
+        {
+            if (ModelState.IsValid)
+            {
+                reservatie.ReservationNumber = new Random().Next(100000, 999999);
+                reservatie.Paid = false;
+                reservatie.Date = DateTime.Now;
+
+                _context.Reservaties.Add(reservatie);
+                _context.SaveChanges();
+
+                return RedirectToAction("Index", "Home");
+            }
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }
