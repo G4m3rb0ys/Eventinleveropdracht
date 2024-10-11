@@ -17,6 +17,7 @@
                 <th>Event Name</th>
                 <th>Start Date</th>
                 <th>End Date</th>
+                <th>Remaining place`s</th>
                 <th>Reserve</th>
             </tr>
         </thead>
@@ -27,6 +28,7 @@
                     <td>@ev.Name</td>
                     <td>@ev.FromDate.ToString("yyyy-MM-dd")</td>
                     <td>@ev.ToDate.ToString("yyyy-MM-dd")</td>
+                    <td>@(ev.MaxParticipants - ev.CurrentParticipants)</td>
                     <td>
                         <!-- Reserveerknop -->
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reserveModal" data-event-id="@ev.Id" data-event-name="@ev.Name">
@@ -89,6 +91,8 @@ else
                 var button = $(event.relatedTarget);
                 var eventId = button.data('event-id');
                 var eventName = button.data('event-name');
+                console.log("EventID set to: " + eventId);
+
 
                 var modal = $(this);
                 modal.find('#eventName').text(eventName);

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Eventinleveropdracht.Data;
 using Eventinleveropdracht.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Eventinleveropdracht.Controllers
 {
@@ -169,23 +170,51 @@ namespace Eventinleveropdracht.Controllers
             return _context.Events.Any(e => e.Id == id);
         }
 
-        // POST: Reservering maken
+
         [HttpPost]
-        public IActionResult Reserve(Reservatie reservatie)
+        public IActionResult Reserve(string Name, int EventID, string Email, string Type, int Amount)
         {
+            int price = 0;
+            if (Type == "Backstage")
+            {
+                price = Amount * 45;
+            }
+            else if (Type == "VIP")
+            {
+                price = Amount * 30;
+            }
+            else
+            {
+                price = Amount * 15;
+            }
+
+            _context.Reservaties.Add(new Reservatie
+            {
+                Name = Name,
+                Email = Email,
+                ReservationNumber = new Random().Next(100000, 999999),
+                Date = DateTime.Now,
+                Type = Type,
+                Amount = Amount,
+                Paid = false,
+                Price = price,
+                EventID = EventID
+            });
+
             if (ModelState.IsValid)
             {
-                reservatie.ReservationNumber = new Random().Next(100000, 999999);
-                reservatie.Paid = false;
-                reservatie.Date = DateTime.Now;
 
-                _context.Reservaties.Add(reservatie);
+
                 _context.SaveChanges();
 
                 return RedirectToAction("Index", "Home");
             }
 
+            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+            Console.WriteLine("Validatiefouten: " + string.Join(", ", errors));
+
             return RedirectToAction("Index", "Home");
         }
+
     }
 }

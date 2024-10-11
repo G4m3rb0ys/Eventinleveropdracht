@@ -133,7 +133,7 @@ namespace Eventinleveropdracht.Data
                 }
             );
 
-            // Seed data voor Reservatie
+            // Seed data voor Reservatie zonder 'Description'
             modelBuilder.Entity<Reservatie>().HasData(
                 new Reservatie
                 {
@@ -141,7 +141,6 @@ namespace Eventinleveropdracht.Data
                     Name = "Jane Doe",
                     Email = "Testing@gmail.com",
                     ReservationNumber = 1234,
-                    Description = "This is a test",
                     Date = DateTime.Now,
                     Type = "VIP",   // Aangepast naar 'Type'
                     Amount = 2,     // Aangepast naar 'Amount'

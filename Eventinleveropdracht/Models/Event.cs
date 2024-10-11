@@ -23,5 +23,10 @@ namespace Eventinleveropdracht.Models
 
         public int? OrganiserId { get; set; }
         public Organizer? Organiser { get; set; }
+
+        public static Event Read(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
