@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Eventinleveropdracht.Data;
 using Eventinleveropdracht.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Eventinleveropdracht.Controllers
 {
@@ -20,10 +19,21 @@ namespace Eventinleveropdracht.Controllers
         }
 
         // GET: Events
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? organiserId)
         {
-            var voorbeeldDatabase = _context.Events.Include(n => n.Organiser);
-            return View(await voorbeeldDatabase.ToListAsync());
+            // Haal alle organisatoren op voor het dropdown-menu
+            var organisatoren = await _context.Organizers.ToListAsync();
+            ViewBag.Organisers = new SelectList(organisatoren, "Id", "Name");
+
+            // Haal de events op en filter op geselecteerde organisator
+            var events = _context.Events.Include(e => e.Organiser).AsQueryable();
+
+            if (organiserId.HasValue)
+            {
+                events = events.Where(e => e.OrganiserId == organiserId.Value);
+            }
+
+            return View(await events.ToListAsync());
         }
 
         // GET: Events/Details/5
@@ -170,7 +180,32 @@ namespace Eventinleveropdracht.Controllers
             return _context.Events.Any(e => e.Id == id);
         }
 
+        [HttpPost]
+        public IActionResult TogglePaymentStatus(int id)
+        {
+            // Haal de reservatie op via het id
+            var reservatie = _context.Reservaties.Find(id);
 
+            if (reservatie == null)
+            {
+                // Foutmelding als de reservatie niet gevonden is
+                TempData["ErrorMessage"] = "Reservatie niet gevonden.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Toggle de betaalstatus
+            reservatie.Paid = !reservatie.Paid;
+
+            // Sla de wijziging op in de database
+            _context.SaveChanges();
+
+            // Succesmelding en terug naar de vorige pagina
+            TempData["SuccessMessage"] = "De betaalstatus is succesvol bijgewerkt.";
+            return RedirectToAction("Details", new { id = reservatie.EventID });
+        }
+
+
+        // POST: Reservering maken
         [HttpPost]
         public IActionResult Reserve(string Name, int EventID, string Email, string Type, int Amount)
         {
@@ -188,6 +223,16 @@ namespace Eventinleveropdracht.Controllers
                 price = Amount * 15;
             }
 
+            // Haal het event op via EventID
+            var eventObj = _context.Events.Find(EventID);
+            if (eventObj == null)
+            {
+                // Als het event niet gevonden wordt, toon een foutmelding
+                TempData["ErrorMessage"] = "Het evenement kon niet worden gevonden.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Voeg de reservatie toe
             _context.Reservaties.Add(new Reservatie
             {
                 Name = Name,
@@ -203,9 +248,14 @@ namespace Eventinleveropdracht.Controllers
 
             if (ModelState.IsValid)
             {
+                // Voeg het aantal gereserveerde tickets toe aan de huidige deelnemers
+                eventObj.CurrentParticipants += Amount;
 
-
+                // Sla zowel de reservatie als het geüpdatete event op
                 _context.SaveChanges();
+
+                // Bewaar de succesmelding in TempData
+                TempData["SuccessMessage"] = "Je reservering is succesvol geplaatst en het aantal deelnemers is bijgewerkt!";
 
                 return RedirectToAction("Index", "Home");
             }
@@ -215,6 +265,5 @@ namespace Eventinleveropdracht.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-
     }
 }

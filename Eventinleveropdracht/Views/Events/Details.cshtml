@@ -105,6 +105,7 @@
                 <th>Type</th>
                 <th>Prijs</th>
                 <th>Betaald</th>
+                <th>Actie</th> <!-- Extra kolom voor de actieknop -->
             </tr>
         </thead>
         <tbody>
@@ -116,6 +117,14 @@
                     <td>@reservatie.Type</td>
                     <td>€@reservatie.Price</td>
                     <td>@(reservatie.Paid ? "Ja" : "Nee")</td>
+                    <td>
+                        <form asp-action="TogglePaymentStatus" method="post">
+                            <input type="hidden" name="id" value="@reservatie.Id" />
+                            <button type="submit" class="btn btn-sm @(reservatie.Paid ? "btn-danger" : "btn-success")">
+                                @(reservatie.Paid ? "Maak onbetaald" : "Markeer als betaald")
+                            </button>
+                        </form>
+                    </td>
                 </tr>
             }
         </tbody>
