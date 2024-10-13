@@ -37,7 +37,6 @@
                     <td>@ev.ToDate.ToString("yyyy-MM-dd")</td>
                     <td>@(ev.MaxParticipants - ev.CurrentParticipants)</td>
                     <td>
-                        <!-- Reserveerknop -->
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reserveModal" data-event-id="@ev.Id" data-event-name="@ev.Name">
                             Reserveer
                         </button>

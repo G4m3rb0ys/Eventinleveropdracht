@@ -1,8 +1,7 @@
-﻿@model IEnumerable<Eventinleveropdracht.Models.Event>
+﻿@model Eventinleveropdracht.Models.EventViewModel
 
 @{
     ViewData["Title"] = "Index";
-    var selectedOrganiserId = Context.Request.Query["organiserId"].ToString();
 }
 
 <div class="d-flex justify-content-between">
@@ -10,45 +9,35 @@
         <a asp-action="Create" class="btn btn-warning">Create new Event</a>
     </p>
 
-    <!-- Bootstrap Dropdown voor organisator selectie -->
-    <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-            Selecteer een organisator
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <li><a class="dropdown-item" href="?organiserId=">Alle Organisatoren</a></li>
-            @foreach (var organiser in ViewBag.Organisers)
-            {
-                <li>
-                    <a class="dropdown-item @(selectedOrganiserId == organiser.Value ? "active" : "")" href="?organiserId=@organiser.Value">
-                        @organiser.Text
-                    </a>
-                </li>
-            }
-        </ul>
-    </div>
+    <form asp-action="Index" method="get">
+        <div class="form-group">
+            <label>Selecteer een organisator</label>
+            <select asp-for="SelectedOrganiserId" class="form-control" asp-items="Model.Organisers"></select>
+        </div>
+        <input type="submit" value="Filter" class="btn btn-primary" />
+    </form>
 </div>
 
 <!-- Event-tabel -->
 <table class="table">
     <thead>
         <tr>
-            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Name)</th>
-            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Description)</th>
-            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().FromDate)</th>
-            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().ToDate)</th>
-            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Location)</th>
-            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Type)</th>
-            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Requirements)</th>
-            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().MaxParticipants)</th>
-            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().CurrentParticipants)</th>
-            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Image)</th>
-            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Organiser.Name)</th>
+            <th>@Html.DisplayNameFor(model => model.Events.FirstOrDefault().Name)</th>
+            <th>@Html.DisplayNameFor(model => model.Events.FirstOrDefault().Description)</th>
+            <th>@Html.DisplayNameFor(model => model.Events.FirstOrDefault().FromDate)</th>
+            <th>@Html.DisplayNameFor(model => model.Events.FirstOrDefault().ToDate)</th>
+            <th>@Html.DisplayNameFor(model => model.Events.FirstOrDefault().Location)</th>
+            <th>@Html.DisplayNameFor(model => model.Events.FirstOrDefault().Type)</th>
+            <th>@Html.DisplayNameFor(model => model.Events.FirstOrDefault().Requirements)</th>
+            <th>@Html.DisplayNameFor(model => model.Events.FirstOrDefault().MaxParticipants)</th>
+            <th>@Html.DisplayNameFor(model => model.Events.FirstOrDefault().CurrentParticipants)</th>
+            <th>@Html.DisplayNameFor(model => model.Events.FirstOrDefault().Image)</th>
+            <th>@Html.DisplayNameFor(model => model.Events.FirstOrDefault().Organiser.Name)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.Events)
         {
             <tr>
                 <td>@Html.DisplayFor(modelItem => item.Name)</td>
@@ -71,4 +60,3 @@
         }
     </tbody>
 </table>
-

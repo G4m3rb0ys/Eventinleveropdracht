@@ -61,8 +61,16 @@ namespace Eventinleveropdracht.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AdminCode,Id,Name,Email,Username,Password,Role")] Admin admin)
+        public async Task<IActionResult> Create([Bind("AdminCode,Id,Name,Email,Username,Password,Role,Discriminator")] Admin admin)
         {
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(admin);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(admin);
@@ -93,8 +101,16 @@ namespace Eventinleveropdracht.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AdminCode,Id,Name,Email,Username,Password,Role")] Admin admin)
+        public async Task<IActionResult> Edit(int id, [Bind("AdminCode,Id,Name,Email,Username,Password,Role,Discriminator")] Admin admin)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                Console.WriteLine("Validatiefouten: " + string.Join(", ", errors));
+
+                TempData["ErrorMessage"] = "Validatie mislukt: " + string.Join(", ", errors);
+            }
+
             if (id != admin.Id)
             {
                 return NotFound();
@@ -104,6 +120,9 @@ namespace Eventinleveropdracht.Controllers
             {
                 try
                 {
+                    admin.Role = "Admin";
+                    admin.Discriminator = "Admin";
+
                     _context.Update(admin);
                     await _context.SaveChangesAsync();
                 }

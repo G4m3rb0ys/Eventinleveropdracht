@@ -19,21 +19,25 @@ namespace Eventinleveropdracht.Controllers
         }
 
         // GET: Events
-        public async Task<IActionResult> Index(int? organiserId)
+        public async Task<IActionResult> Index(int? SelectedOrganiserId)
         {
-            // Haal alle organisatoren op voor het dropdown-menu
             var organisatoren = await _context.Organizers.ToListAsync();
-            ViewBag.Organisers = new SelectList(organisatoren, "Id", "Name");
-
-            // Haal de events op en filter op geselecteerde organisator
             var events = _context.Events.Include(e => e.Organiser).AsQueryable();
 
-            if (organiserId.HasValue)
+            if (SelectedOrganiserId.HasValue)
             {
-                events = events.Where(e => e.OrganiserId == organiserId.Value);
+                Console.WriteLine($"Selected Organiser ID: {SelectedOrganiserId}");
+                events = events.Where(e => e.OrganiserId == SelectedOrganiserId.Value);
             }
 
-            return View(await events.ToListAsync());
+            var viewModel = new EventViewModel
+            {
+                Organisers = new SelectList(organisatoren, "Id", "Name"),
+                SelectedOrganiserId = SelectedOrganiserId,
+                Events = await events.ToListAsync()
+            };
+
+            return View(viewModel);
         }
 
         // GET: Events/Details/5
@@ -44,10 +48,9 @@ namespace Eventinleveropdracht.Controllers
                 return NotFound();
             }
 
-            // Haal het event op met reserveringen
             var @event = await _context.Events
                 .Include(e => e.Organiser)
-                .Include(e => e.Reservations) // Zorg dat reserveringen geladen worden
+                .Include(e => e.Reservations)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (@event == null)
@@ -55,7 +58,6 @@ namespace Eventinleveropdracht.Controllers
                 return NotFound();
             }
 
-            // Zoekfilter toepassen op de reserveringen
             if (!string.IsNullOrEmpty(searchString))
             {
                 @event.Reservations = @event.Reservations
@@ -71,23 +73,37 @@ namespace Eventinleveropdracht.Controllers
         // GET: Events/Create
         public IActionResult Create()
         {
-            ViewData["OrganiserId"] = new SelectList(_context.Organizers, "Id", "Name");
-            return View();
+            var viewModel = new EventViewModel
+            {
+                Event = new Event(),
+                Organisers = new SelectList(_context.Organizers, "Id", "Name")
+            };
+            return View(viewModel);
         }
+
 
         // POST: Events/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,FromDate,ToDate,Location,Type,Requirements,MaxParticipants,CurrentParticipants,Image,OrganiserId")] Event @event)
+        public async Task<IActionResult> Create(EventViewModel viewModel)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                Console.WriteLine("Validatiefouten: " + string.Join(", ", errors));
+
+                TempData["ErrorMessage"] = "Validatie mislukt: " + string.Join(", ", errors);
+            }
+
             if (ModelState.IsValid)
             {
-                _context.Add(@event);
+                _context.Add(viewModel.Event);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["OrganiserId"] = new SelectList(_context.Organizers, "Id", "Name", @event.OrganiserId);
-            return View(@event);
+
+            viewModel.Organisers = new SelectList(_context.Organizers, "Id", "Name", viewModel.Event.OrganiserId);
+            return View(viewModel);
         }
 
         // GET: Events/Edit/5
@@ -103,16 +119,22 @@ namespace Eventinleveropdracht.Controllers
             {
                 return NotFound();
             }
-            ViewData["OrganiserId"] = new SelectList(_context.Organizers, "Id", "Name", @event.OrganiserId);
-            return View(@event);
+
+            var viewModel = new EventViewModel
+            {
+                Event = @event,
+                Organisers = new SelectList(_context.Organizers, "Id", "Name", @event.OrganiserId)
+            };
+
+            return View(viewModel);
         }
 
         // POST: Events/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,FromDate,ToDate,Location,Type,Requirements,MaxParticipants,CurrentParticipants,Image,OrganiserId")] Event @event)
+        public async Task<IActionResult> Edit(int id, EventViewModel viewModel)
         {
-            if (id != @event.Id)
+            if (id != viewModel.Event.Id)
             {
                 return NotFound();
             }
@@ -121,12 +143,12 @@ namespace Eventinleveropdracht.Controllers
             {
                 try
                 {
-                    _context.Update(@event);
+                    _context.Update(viewModel.Event);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!EventExists(@event.Id))
+                    if (!EventExists(viewModel.Event.Id))
                     {
                         return NotFound();
                     }
@@ -137,8 +159,9 @@ namespace Eventinleveropdracht.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["OrganiserId"] = new SelectList(_context.Organizers, "Id", "Name", @event.OrganiserId);
-            return View(@event);
+
+            viewModel.Organisers = new SelectList(_context.Organizers, "Id", "Name", viewModel.Event.OrganiserId);
+            return View(viewModel);
         }
 
         // GET: Events/Delete/5
@@ -166,73 +189,64 @@ namespace Eventinleveropdracht.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var @event = await _context.Events.FindAsync(id);
+
             if (@event != null)
             {
+                // Verwijder alle gerelateerde reservaties eerst
+                var reservaties = _context.Reservaties.Where(r => r.EventID == id);
+                _context.Reservaties.RemoveRange(reservaties);
+
+                // Verwijder daarna het event
                 _context.Events.Remove(@event);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool EventExists(int id)
         {
             return _context.Events.Any(e => e.Id == id);
         }
 
+        // POST: Toggle Payment Status
         [HttpPost]
         public IActionResult TogglePaymentStatus(int id)
         {
-            // Haal de reservatie op via het id
             var reservatie = _context.Reservaties.Find(id);
 
             if (reservatie == null)
             {
-                // Foutmelding als de reservatie niet gevonden is
                 TempData["ErrorMessage"] = "Reservatie niet gevonden.";
                 return RedirectToAction("Index", "Home");
             }
 
-            // Toggle de betaalstatus
             reservatie.Paid = !reservatie.Paid;
-
-            // Sla de wijziging op in de database
             _context.SaveChanges();
 
-            // Succesmelding en terug naar de vorige pagina
             TempData["SuccessMessage"] = "De betaalstatus is succesvol bijgewerkt.";
             return RedirectToAction("Details", new { id = reservatie.EventID });
         }
-
 
         // POST: Reservering maken
         [HttpPost]
         public IActionResult Reserve(string Name, int EventID, string Email, string Type, int Amount)
         {
-            int price = 0;
-            if (Type == "Backstage")
+            int price = Type switch
             {
-                price = Amount * 45;
-            }
-            else if (Type == "VIP")
-            {
-                price = Amount * 30;
-            }
-            else
-            {
-                price = Amount * 15;
-            }
+                "Backstage" => Amount * 45,
+                "VIP" => Amount * 30,
+                _ => Amount * 15,
+            };
 
-            // Haal het event op via EventID
             var eventObj = _context.Events.Find(EventID);
             if (eventObj == null)
             {
-                // Als het event niet gevonden wordt, toon een foutmelding
                 TempData["ErrorMessage"] = "Het evenement kon niet worden gevonden.";
                 return RedirectToAction("Index", "Home");
             }
 
-            // Voeg de reservatie toe
             _context.Reservaties.Add(new Reservatie
             {
                 Name = Name,
@@ -248,15 +262,9 @@ namespace Eventinleveropdracht.Controllers
 
             if (ModelState.IsValid)
             {
-                // Voeg het aantal gereserveerde tickets toe aan de huidige deelnemers
                 eventObj.CurrentParticipants += Amount;
-
-                // Sla zowel de reservatie als het geüpdatete event op
                 _context.SaveChanges();
-
-                // Bewaar de succesmelding in TempData
-                TempData["SuccessMessage"] = "Je reservering is succesvol geplaatst en het aantal deelnemers is bijgewerkt!";
-
+                TempData["SuccessMessage"] = "Je reservering is succesvol geplaatst U kunt het openstaande bedrag ter plekke betalen:" + price;
                 return RedirectToAction("Index", "Home");
             }
 
