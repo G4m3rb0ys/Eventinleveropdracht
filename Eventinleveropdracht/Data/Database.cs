@@ -35,21 +35,21 @@ namespace Eventinleveropdracht.Data
                 .HasOne(e => e.Organiser)
                 .WithMany()
                 .HasForeignKey(e => e.OrganiserId)
-                .OnDelete(DeleteBehavior.Restrict); // Vermijd cascade delete
+                .OnDelete(DeleteBehavior.Restrict); 
 
             // Event -> Reservatie (One-to-Many)
             modelBuilder.Entity<Reservatie>()
                 .HasOne(r => r.Event)
                 .WithMany(e => e.Reservations)
                 .HasForeignKey(r => r.EventID)
-                .OnDelete(DeleteBehavior.Restrict); // Geen cascade delete
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Order -> Reservatie (One-to-One of Many) zonder cascade delete
+            // Order -> Reservatie (One-to-One of Many)
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Reservatie)
                 .WithMany()
                 .HasForeignKey(o => o.ReservatieId)
-                .OnDelete(DeleteBehavior.Restrict); // Geen cascade delete
+                .OnDelete(DeleteBehavior.Restrict); 
 
             // Seed data voor Organizer
             modelBuilder.Entity<Organizer>().HasData(
@@ -129,7 +129,7 @@ namespace Eventinleveropdracht.Data
                     MaxParticipants = 500,
                     CurrentParticipants = 50,
                     Image = "ComingSoon.jpg",
-                    OrganiserId = 1  // Verwijzing naar de bestaande Organizer
+                    OrganiserId = 1  
                 }
             );
 
@@ -142,11 +142,11 @@ namespace Eventinleveropdracht.Data
                     Email = "Testing@gmail.com",
                     ReservationNumber = 1234,
                     Date = DateTime.Now,
-                    Type = "VIP",   // Aangepast naar 'Type'
-                    Amount = 2,     // Aangepast naar 'Amount'
+                    Type = "VIP",   
+                    Amount = 2,     
                     Paid = true,
                     Price = 50,
-                    EventID = 2  // Verwijzing naar het Event (Test2)
+                    EventID = 2  
                 }
             );
 
@@ -157,8 +157,8 @@ namespace Eventinleveropdracht.Data
                     Id = 1,
                     Date = DateTime.Now,
                     Status = "Paid",
-                    ReservatieId = 1,  // Verwijzing naar de Reservatie (Id = 1)
-                    GuestId = 2  // Verwijzing naar Guest (Id = 2)
+                    ReservatieId = 1,  
+                    GuestId = 2  
                 }
             );
         }

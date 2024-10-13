@@ -40,7 +40,6 @@ button.accept-policy {
     line-height: inherit;
 }
 
-/* Zorg dat de body en html de volledige hoogte van het scherm innemen */
 html, body {
     height: 100%;
     margin: 0;
@@ -48,11 +47,11 @@ html, body {
 
 body {
     display: flex;
-    flex-direction: column; /* Zorg ervoor dat de body in kolommen is verdeeld */
+    flex-direction: column; 
 }
 
 .container {
-    flex: 1; /* Zorg dat de container de beschikbare ruimte opvult */
+    flex: 1; 
 }
 
 .footer {
@@ -61,5 +60,5 @@ body {
     width: 100%;
     white-space: nowrap;
     line-height: 60px;
-    margin-top: auto; /* Duwt de footer naar onderen */
+    margin-top: auto; 
 }

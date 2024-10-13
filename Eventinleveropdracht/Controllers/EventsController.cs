@@ -192,11 +192,9 @@ namespace Eventinleveropdracht.Controllers
 
             if (@event != null)
             {
-                // Verwijder alle gerelateerde reservaties eerst
                 var reservaties = _context.Reservaties.Where(r => r.EventID == id);
                 _context.Reservaties.RemoveRange(reservaties);
 
-                // Verwijder daarna het event
                 _context.Events.Remove(@event);
                 await _context.SaveChangesAsync();
             }
